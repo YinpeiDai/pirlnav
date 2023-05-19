@@ -3,11 +3,11 @@
 #SBATCH --account=chaijy1
 #SBATCH --partition=gpu
 #SBATCH --time=00:30:00                 
-#SBATCH --nodes=1                           
-#SBATCH --cpus-per-task=1                     
-#SBATCH --mem-per-gpu=14000m
-#SBATCH --gpus-per-node=2
-#SBATCH --ntasks-per-gpu=3                 
+#SBATCH --nodes=2 
+#SBATCH --gpus-per-node=v100:2                       
+#SBATCH --ntasks-per-node=2
+#SBATCH --cpus-per-task=8               
+#SBATCH --mem-per-gpu=9000m                  
 #SBATCH --output=/home/%u/pirlnav/slurm_logs/%x-%j.log         
 #SBATCH --mail-user=daiyp@umich.edu
 #SBATCH --mail-type=BEGIN,END
@@ -16,14 +16,11 @@ module load python3.9-anaconda/2021.11
 source /home/daiyp/.bashrc
 conda activate pirlnav
 
-MAIN_ADDR=$(srun --ntasks=1 hostname 2>&1 | tail -n1)
-export MAIN_ADDR
-echo $MAIN_ADDR
-echo $MAIN_PORT
-
-echo $SLURM_LOCALID
-echo $SLURM_PROCID
-echo $SLURM_NTASKS
+echo "NODELIST="${SLURM_NODELIST}
+master_addr=$(scontrol show hostnames "$SLURM_JOB_NODELIST" | head -n 1)
+export MAIN_ADDR=$master_addr
+echo "MAIN_ADDR="$MAIN_ADDR
+/bin/hostname
 
 export GLOG_minloglevel=2
 export MAGNUM_LOG=quiet
@@ -52,6 +49,3 @@ srun python -u -m run \
     RL.DDPPO.pretrained True \
     TASK_CONFIG.DATASET.DATA_PATH "$DATA_PATH/{split}/{split}.json.gz" \
     VERBOSE False
-    
-# ln -s /scratch/chaijy_root/chaijy1/daiyp/data/habitat_data/datasets  data/datasets  
-# ln -s /scratch/chaijy_root/chaijy1/daiyp/data/habitat_data/scene_datasets  data/scene_datasets
