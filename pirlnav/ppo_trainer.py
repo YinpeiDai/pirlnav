@@ -438,6 +438,17 @@ class PIRLNavPPOTrainer(PPOTrainer):
         self.pth_time = 0.0
         self.t_start = time.time()
 
+        if torch.distributed.is_initialized():
+            logger.info("Torch distributed initialized successfully")
+        else:
+            logger.info("Torch distributed initialization failed")
+        
+        # check whether model actor_critic is on the cuda device
+        if next(self.actor_critic.parameters()).is_cuda:
+            logger.info("actor_critic is on cuda device")
+        else:
+            logger.info("actor_critic is not on cuda device")
+
     @rank0_only
     def _training_log(
         self, writer, losses: Dict[str, float], prev_time: int = 0

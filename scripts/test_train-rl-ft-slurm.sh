@@ -1,13 +1,13 @@
 #!/bin/bash
 #SBATCH --job-name=pirlnav-ddppo
 #SBATCH --account=chaijy1
-#SBATCH --partition=gpu
-#SBATCH --time=00:30:00                 
+#SBATCH --partition=spgpu
+#SBATCH --time=00:18:00                 
 #SBATCH --nodes=2 
-#SBATCH --gpus-per-node=v100:2                       
+#SBATCH --gpus-per-node=2                       
 #SBATCH --ntasks-per-node=2
-#SBATCH --cpus-per-task=8               
-#SBATCH --mem-per-gpu=9000m                  
+#SBATCH --cpus-per-task=4               
+#SBATCH --mem=70g              
 #SBATCH --output=/home/%u/pirlnav/slurm_logs/%x-%j.log         
 #SBATCH --mail-user=daiyp@umich.edu
 #SBATCH --mail-type=BEGIN,END
@@ -21,6 +21,8 @@ master_addr=$(scontrol show hostnames "$SLURM_JOB_NODELIST" | head -n 1)
 export MAIN_ADDR=$master_addr
 echo "MAIN_ADDR="$MAIN_ADDR
 /bin/hostname
+
+echo "node 2 gpu-per-node 2 tasks-per-node 2 cpu-per-task 4 --mem=70g"
 
 export GLOG_minloglevel=2
 export MAGNUM_LOG=quiet
